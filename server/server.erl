@@ -77,4 +77,3 @@ update_(Update) ->
 			Update_ = []
 	end,
 	update_(Update_).
-	
