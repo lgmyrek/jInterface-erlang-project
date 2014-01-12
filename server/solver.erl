@@ -4,7 +4,7 @@
 
 add_move(Update, Move, ShipID) ->
 	Others = [{Ship, Moves} || {Ship, Moves} <- Update, Ship /= ShipID],
-	ShipsID = [{Ship} || {Ship,_} <- Update],
+	ShipsID = [Ship || {Ship,_} <- Update],
 	Condition0 = lists:member(ShipID, ShipsID),
 	if 
 		Condition0 == true ->
@@ -40,7 +40,8 @@ update_game(Time,Ships,Fire,Update) ->
 	Ships_v0 = check_new(Ships,[ShipId || {ShipId, _} <- Update]),
 	{Ships_v1, Fire_v1} = update_ship_and_fire(Ships_v0,Update,Fire,[]),
 	Fire_v2 = move_fire(Fire_v1,[]),
-	Ships_v2 = check_hit(Ships_v1,Fire_v2,[]),
+	%%%Ships_v2 = check_hit(Ships_v1,Fire_v2,[]),
+	Ships_v2 = Ships_v1,
 	{Time,Ships_v2,Fire_v2}.
 	
 %%% Sprawdza czy do gry nie wlaczyly sie nowe statki
@@ -73,8 +74,10 @@ update_ship_and_fire([Ship|STail], Update, Fire, New_ShipState) ->
 	update_ship_and_fire(STail, Update, Fire_, [Ship_|New_ShipState]). %przechodzi dalej
 
 %%% Proste dodawanie nowego strzalu %%% OK	
-add_fire(Eagle, Coor, Fire) ->
-	[{Eagle,Coor}|Fire]. 
+add_fire(Eagle, {X_,Y_}, Fire) ->
+	X = X_ + 100 * math:cos(math:pi() * Eagle/180.0),
+	Y = Y_ + 100 * math:cos(math:pi() * Eagle/180.0),
+	[{Eagle,{X,Y}}|Fire]. 
 
 %%% Obsluga poruszania statkiem %%% OK
 add_action(Ship, []) -> Ship;
@@ -102,7 +105,8 @@ check_hit([], Fire, New_ShipList) ->
 check_hit([Ship|STail], Fire, New_ShipList) -> % pierwsza iteracja New_ShipList = []
 	IsDead = try_fire(Ship, Fire), % dla kazdego statku pisze czy jest martwy czy nie
 	if 
-		isDead == true -> 
+		IsDead == true -> 
+			io:format("Statek nie zyje"),
 			check_hit(STail, Fire, New_ShipList);
 		true -> 
 			check_hit(STail, Fire, [Ship|New_ShipList])		
@@ -111,11 +115,12 @@ check_hit([Ship|STail], Fire, New_ShipList) -> % pierwsza iteracja New_ShipList 
 try_fire(_, []) -> false;
 try_fire(Ship, [{_, {F_X, F_Y}}|Tail]) ->
 	{_, {X,Y}, _, _} = Ship,
-	X_RES = 30.0, % wymiary statku,
-	Y_RES = 30.0,
+	X_RES = 45.0, % wymiary statku,
+	Y_RES = 45.0,
 	Distance_Cond = math:sqrt(math:pow(X-F_X,2)+math:pow(Y-F_Y,2)),
 	if 
 		X_RES<Distance_Cond -> 
+			io:format("Mniejszy niz srednica ~w, ~w, ~w, ~w, ~w",[Distance_Cond, X, Y, F_X, F_Y]),
 			Dead = true;
 		true -> Dead = try_fire(Ship, Tail)
 	end,
@@ -123,7 +128,7 @@ try_fire(Ship, [{_, {F_X, F_Y}}|Tail]) ->
 
 move_fire([],FireList) -> FireList;
 move_fire([{Eagle, {X, Y}}|FireList],New_FireList) -> %Nowe wspolrzedne pocisku
-	PF = 2.0, % ile pikseli do przodu pocisk
+	PF = 5.0, % ile pikseli do przodu pocisk
 	X_ = X + PF * math:cos(math:pi() * Eagle/180.0),
 	Y_ = Y + PF * math:sin(math:pi() * Eagle/180.0),
 	if 
@@ -135,7 +140,7 @@ move_fire([{Eagle, {X, Y}}|FireList],New_FireList) -> %Nowe wspolrzedne pocisku
 	end.
 
 move_ship({Eagle, {X, Y}, ShipId, IsDead}) -> %Nowe wspolrzedne statku
-	PF = 1.0, % ile pikseli do przodu statek
+	PF = 3.0, % ile pikseli do przodu statek
 	X_ = X + PF * math:cos(math:pi() * Eagle/180.0),
 	Y_ = Y + PF * math:sin(math:pi() * Eagle/180.0),
 	if 
@@ -149,5 +154,3 @@ move_ship({Eagle, {X, Y}, ShipId, IsDead}) -> %Nowe wspolrzedne statku
 		true -> New_Y = Y_
 	end,
 	{Eagle, {New_X, New_Y}, ShipId, IsDead}.
-
-
