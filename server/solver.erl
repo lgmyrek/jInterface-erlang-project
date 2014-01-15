@@ -76,7 +76,7 @@ update_ship_and_fire([Ship|STail], Update, Fire, New_ShipState) ->
 %%% Proste dodawanie nowego strzalu %%% OK	
 add_fire(Eagle, {X_,Y_}, Fire) ->
 	X = X_ + 100 * math:cos(math:pi() * Eagle/180.0),
-	Y = Y_ + 100 * math:cos(math:pi() * Eagle/180.0),
+	Y = Y_ + 100 * math:sin(math:pi() * Eagle/180.0),
 	[{Eagle,{X,Y}}|Fire]. 
 
 %%% Obsluga poruszania statkiem %%% OK
