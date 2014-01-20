@@ -50,7 +50,7 @@ check_new(Ships,[Ship|Tail]) ->
 	Condition = lists:member(Ship,Ship_list),
 	if
 		Condition==false -> 
-			check_new([{0.0,{100.0,100.0},Ship,false}|Ships],Tail);
+			check_new([{0.0,{random:uniform()*800.0,random:uniform()*600.0},Ship,false}|Ships],Tail);
 		true -> check_new(Ships,Tail)
 	end.
 	
@@ -81,7 +81,7 @@ add_fire(Eagle, {X_,Y_}, Fire) ->
 %%% Obsluga poruszania statkiem %%% OK
 add_action(Ship, []) -> Ship;
 add_action(Ship, [Move|MTail]) ->
-	ES = 1.0, % o ile obracac kat w ciagu jednego przejscia petli
+	ES = 2.0, % o ile obracac kat w ciagu jednego przejscia petli
 	{Eagle, {X,Y}, ShipId, IsDead} = Ship,
 	if
 		Move == left ->
