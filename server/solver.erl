@@ -118,7 +118,6 @@ try_fire(Ship, [{_, {F_X, F_Y}}|Tail]) ->
 	Distance_Cond = math:sqrt(math:pow(X-F_X,2)+math:pow(Y-F_Y,2)),
 	if 
 		X_RES>Distance_Cond -> 
-			io:format("Mniejszy niz srednica ~w, ~w, ~w, ~w, ~w ~n~n",[Distance_Cond, X, Y, F_X, F_Y]),
 			Dead = true;
 		true -> Dead = try_fire(Ship, Tail)
 	end,
